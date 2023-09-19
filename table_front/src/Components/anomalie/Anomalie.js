@@ -155,7 +155,7 @@ const handleReset = () => {
 }, [ref,content.name]) */
 /* const handleExport = () => {
 
-  axios.get('http://webaudit.smartskills.tn:8000/api/generate-word-document')
+  axios.get('http://webapp.smartskills.local:8000/api/generate-word-document')
       .then((response) => {
         // Handle the response as needed
         
@@ -325,7 +325,7 @@ console.log(risk)
     };
     console.log(dataToSend.element_imp)
     // Make the Axios POST request to send the data
-    axios.post('http://webaudit.smartskills.tn:8000/api/Anomalie/create', dataToSend)
+    axios.post('http://webapp.smartskills.local:8000/api/Anomalie/create', dataToSend)
       .then((response) => {
         // Handle the response as needed
         if(response.data.status === 200)

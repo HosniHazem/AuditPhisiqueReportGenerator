@@ -19,7 +19,7 @@ export default function AuthUser(){
     const [last,setLast] = useState();
 
     useEffect(() => {
-      axios.get('http://webaudit.smartskills.tn:8000/api/LastOne').then((res) => {
+      axios.get('http://webapp.smartskills.local:8000/api/LastOne').then((res) => {
 
             setLast(res.data.lastProjectId);
    
@@ -60,7 +60,7 @@ export default function AuthUser(){
 
 
     const http = axios.create({
-        baseURL:"http://webaudit.smartskills.tn:8000/api",
+        baseURL:"http://webapp.smartskills.local:8000/api",
         headers:{
             "Content-type" : "application/json",
             "Authorization" : `Bearer ${token}`,

@@ -53,7 +53,7 @@ const ApiGet = () => {
   };
   console.log(dataToSend)
   // Make the Axios POST request to send the data
-  axios.post('http://webaudit.smartskills.tn:8000/api/apicall', dataToSend)
+  axios.post('http://webapp.smartskills.local:8000/api/apicall', dataToSend)
     .then((response) => {
 
 if(response.data.status===200){

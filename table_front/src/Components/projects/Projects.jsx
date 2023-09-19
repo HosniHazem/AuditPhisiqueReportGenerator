@@ -18,7 +18,7 @@ const Projects = () => {
     let userInfo = JSON.parse(info);
     
     useEffect(() => {
-      axios.post(`http://webaudit.smartskills.tn:8000/api/my-projects/${userInfo.id}`,).then((res) => {
+      axios.post(`http://webapp.smartskills.local:8000/api/my-projects/${userInfo.id}`,).then((res) => {
         if(res.status === 200){
         setProject(res.data.Project);
    }
@@ -93,7 +93,7 @@ const Projects = () => {
           project_id: id,
         };
         setExporting(true);
-        axios.post('http://webaudit.smartskills.tn:8000/api/generate-word-document',dataToSend)
+        axios.post('http://webapp.smartskills.local:8000/api/generate-word-document',dataToSend)
           .then((response) => {
            // Assuming the response is in JSON format and contains a 'download_link'
            const downloadLink = response.data.download_link;

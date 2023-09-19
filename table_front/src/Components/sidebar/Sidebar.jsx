@@ -102,7 +102,7 @@ const Sidebar = () => {
         if (newProjectID !== projectID) {
           setProjectID(newProjectID);
           axios
-          .get(`http://webaudit.smartskills.tn:8000/api/Project/${newProjectID}/show`)
+          .get(`http://webapp.smartskills.local:8000/api/Project/${newProjectID}/show`)
           .then((response) => {
             setProjectName(response.data.Project); // Store the entire response data object
           })

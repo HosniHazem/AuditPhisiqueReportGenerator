@@ -50,7 +50,7 @@ const View = () => {
          const [anomalies, setAnomalies] = useState([]);
 
     useEffect(() => {
-      axios.post(`http://webaudit.smartskills.tn:8000/api/my-anomalies/${project_id}`,).then((res) => {
+      axios.post(`http://webapp.smartskills.local:8000/api/my-anomalies/${project_id}`,).then((res) => {
         if(res.status === 200){
           const sortedAnomalies = res.data.Anomalies.sort((a, b) => b.score - a.score);
           setAnomalies(sortedAnomalies);
@@ -66,7 +66,7 @@ const View = () => {
     }, []);
     const [project, setProject] = useState(1); 
     useEffect(() => {
-      axios.get(`http://webaudit.smartskills.tn:8000/api/Project/${project_id}/show/`).then((res) => {
+      axios.get(`http://webapp.smartskills.local:8000/api/Project/${project_id}/show/`).then((res) => {
         if(res.status === 200){
           setProject( res.data.Project);
           console.log(res.data)
@@ -274,7 +274,7 @@ const itemsPerPage = 1; // You can adjust this as needed
 
       e.persist();
 
-      axios.put(`http://webaudit.smartskills.tn:8000/api/Anomalie/${ids}/validate`)
+      axios.put(`http://webapp.smartskills.local:8000/api/Anomalie/${ids}/validate`)
       .then((response) => {
         // Handle the response as needed
         if(response.data.status === 200)
@@ -294,7 +294,7 @@ const itemsPerPage = 1; // You can adjust this as needed
     const handleDevalidate = (ids,e) => {
 
       e.persist();
-      axios.put(`http://webaudit.smartskills.tn:8000/api/Anomalie/${ids}/devalidate`)
+      axios.put(`http://webapp.smartskills.local:8000/api/Anomalie/${ids}/devalidate`)
       .then((response) => {
         // Handle the response as needed
         if(response.data.status === 200)
@@ -345,7 +345,7 @@ const itemsPerPage = 1; // You can adjust this as needed
       };
       console.log(dataToSend);
       // Make the Axios POST request to send the data
-      axios.put(`http://webaudit.smartskills.tn:8000/api/Anomalie/${Now.id}/update`, dataToSend)
+      axios.put(`http://webapp.smartskills.local:8000/api/Anomalie/${Now.id}/update`, dataToSend)
         .then((response) => {
           // Handle the response as needed
           if(response.data.status === 200)
