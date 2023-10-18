@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\File;
 class WordDocumentController extends Controller
 {
     public function generateWordDocument(Request $request)
-    { 
+    {
         $docxDirectory = public_path('storage');
 $docxs = glob($docxDirectory . '/*.docx'); // Get a list of all PNG files in the directory
 
@@ -32,14 +32,14 @@ foreach ($docxs as $docx) {
     ->get(); // Replace with your actual model and data retrieval logic
 
     $dataLength = count($data);
-    
+
     // Check if the provided 'project_id' matches the 'project_id' associated with the anomalies
     $userCanAccessData = $data->isEmpty() ? false : true;
 
     if (!$userCanAccessData) {
         return response()->json(['message' => 'Unauthorized access.']);
     }
-        
+
         // Load the Word template
        // $templatePath = public_path('WebReportTMPLATE.docx');
        $templatePath1 = public_path('test.docx');
@@ -72,22 +72,22 @@ foreach ($docxs as $docx) {
             if (!File::exists($imagePath)) {
             $snappy = new SnappyImage('"C:/Program Files/wkhtmltopdf/bin/wkhtmltoimage"'); // Provide the path to wkhtmltoimage binary
             $snappy->setOption('format', 'png'); // Set the desired output format
-            
+
             // Convert HTML to image
             $imageData = $snappy->getOutputFromHtml($item->preuve);
-            
+
             // Save the image locally
             $imagePath = public_path('images/'.$item->id.'.png'); // Path to save the image
             file_put_contents($imagePath, $imageData);
-            
+
             // Return the image URL as response
             $imageUrl = asset('images/'.$item->id.'.png'); // Generate a URL for the saved image
             }
-   
+
 
         }
-    
-        
+
+
         $me=0;
         $l=0;
         $m=1;
@@ -96,14 +96,14 @@ foreach ($docxs as $docx) {
         $n=0;
         foreach ($data as $item) {
             $trieValue = str_pad($trieCounter, 3, '0', STR_PAD_LEFT);
-    
+
             $trieCounter++;
             $n++;
             $values[] = [
                 'id' => $n,
                 'name' => $item->name,
                 'element_imp' => $item->element_imp,
-                'description' => $item->description,
+                'description' => self::cleanHtmlTag($item->description),
                 'risque' => $item->risque,
                 'score_cvss' => $item->score_cvss,
                 'score' => $item->score,
@@ -118,7 +118,7 @@ foreach ($docxs as $docx) {
                 'ref' => $item->ref,
                 'preuve' => $item->preuve,
                 'recommendation' => $item->recommendation,
-                'image' => $item->image, 
+                'image' => $item->image,
                 'trie' => $trieValue,
                 'compl'=>$item->compl,
             ];
@@ -131,8 +131,13 @@ foreach ($docxs as $docx) {
             $templateProcessor->setValue('id' .'#'. $m, $item->id);
             $templateProcessor->setValue('name' .'#'. $m, $item->name);
             $templateProcessor->setValue('element_imp' .'#'. $m, $item->element_imp);
-            $templateProcessor->setValue('description' .'#'. $m, $item->description);
-            $templateProcessor->setValue('risque' .'#'. $m, $item->risque);
+            $templateProcessor->setValue('description' .'#'. $m, self::cleanHtmlTag($item->description));
+           // echo $item->description;
+            echo ">>>>>>\n";
+       //     echo self::cleanHtmlTag($item->description)));
+
+            echo "||||||\n";
+            $templateProcessor->setValue('risque' .'#'. $m, self::cleanHtmlTag($item->risque));
             $templateProcessor->setValue('score_cvss' .'#'. $m, $item->score_cvss);
             $templateProcessor->setValue('score' .'#'. $m, $item->score);
             $templateProcessor->setValue('AV' .'#'. $m, $item->AV);
@@ -146,21 +151,21 @@ foreach ($docxs as $docx) {
             if($item->ref===null){
                 $templateProcessor->setValue('ref' .'#'. $m, "");
             }else {
-                $templateProcessor->setValue('ref' .'#'. $m, $item->ref);
+                $templateProcessor->setValue('ref' .'#'. $m,self::cleanHtmlTag( $item->ref));
             }
 
             $templateProcessor->setValue('image' .'#'. $m, $item->image);
-            $templateProcessor->setValue('recommendation' .'#'. $m, $item->recommendation);
+            $templateProcessor->setValue('recommendation' .'#'. $m,  self::cleanHtmlTag($item->recommendation));
             $templateProcessor->setValue('trieValue' .'#'. $m, $trieValue);
 
 
              // Assuming $item->preuve contains the image file name
         $imageFileName = $item->id;
         $imagePath = public_path('images/' . $imageFileName . '.png'); // Construct the image path
-        
-        $templateProcessor->setImageValue('preuve' .'#'. $m, $imagePath); 
 
-           
+        $templateProcessor->setImageValue('preuve' .'#'. $m, $imagePath);
+
+
             $m++;
 
 
@@ -200,15 +205,15 @@ $templateProcessor->setValue('DESC',  $project->Description);
 
 $level = 'Insatisfaisant'; // If Critical or High vulnerabilities are present
 if ($c===0 && $h===0 ) {
-    $level = 'satisfaisant'; 
+    $level = 'satisfaisant';
 }
 
 $templateProcessor->setValue('level', $level);
 $todayDate = date('d/m/Y'); // Format: Day/Month/Year (e.g., 16/08/2023)
 
 $templateProcessor->setValue('date', $todayDate);
-       $templateProcessor->cloneRowAndSetValues('id', $values); 
-  
+       $templateProcessor->cloneRowAndSetValues('id', $values);
+
    // Generate a unique filename for the output document
    $outputFileName = $customer->SN . "_" . $project->Nom. $project->year . '_WebAppPentestReport.docx';
 
@@ -234,4 +239,37 @@ $templateProcessor->saveAs($outputPath);
 // Return the download link or file path in the API response
 return response()->json(['download_link' => asset('storage/' . $outputFileName)]);
         }
+
+
+        public static function cleanHtmlTag ($string)
+        {
+            return self::cleanNewLineProblem( strip_tags( str_replace("<br/>","\n",htmlspecialchars_decode(html_entity_decode($string)))));
+
+        }
+
+   public static function cleanNewLineProblem ($string)
+   {
+       $pattern1 = "/([[:punct:]]+ *)(\n)+/";
+//		$pattern11 = "/([[:punct:]]+ *)(\{\{1\}\})+/";
+
+       $pattern2 = "/(\n)+( *-)/";
+//		$pattern21 = "/(\{\{1\}\})+( *-)/";
+
+       $pattern3 = "/(\n)+/";
+//		$pattern31 = "/(\{\{1\}\})+/";
+
+       $replacement = "</w:t></w:r><w:r><w:br/><w:t>";
+       $string = htmlspecialchars($string);
+       $string = preg_replace($pattern1, '${1}'.$replacement, $string);
+      // $string = preg_replace($pattern11, '${1}'.$replacement, $string);
+       $string = preg_replace($pattern2, $replacement.'${2}', $string);
+    //   $string = preg_replace($pattern21, $replacement.'${2}', $string);
+
+
+     //  $string = preg_replace( $pattern31 , " ", $string);
+
+
+       $string = preg_replace('/[\x00-\x1F\x7F]/u', '', $string);
+       return $string;
+   }
 }
